@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Vision AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center py-12 px-4">
+
+    <div class="max-w-2xl w-full bg-white rounded-xl shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Gemini Vision AI</h1>
+        <p class="text-gray-600 mb-8">Upload an image to see what the AI thinks about it.</p>
+
+        <div class="space-y-6">
+            <div class="flex items-center justify-center w-full">
+                <label class="flex flex-col w-full h-32 border-4 border-dashed border-gray-200 hover:bg-gray-50 hover:border-blue-300 transition-colors cursor-pointer rounded-lg group">
+                    <div class="flex flex-col items-center justify-center pt-7">
+                        <svg class="w-8 h-8 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <p class="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-blue-500" id="file-label">Select a photo</p>
+                    </div>
+                    <input type="file" id="imageInput" class="hidden" accept="image/*" onchange="previewImage(event)" />
+                </label>
+            </div>
+
+            <img id="preview" class="hidden w-full h-64 object-cover rounded-lg shadow-md mb-4" />
+
+            <button onclick="uploadImage()" id="submitBtn" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-all disabled:bg-gray-400">
+                Analyze Image
+            </button>
+        </div>
+
+        <div id="loading" class="hidden mt-8 flex flex-col items-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+            <p class="text-gray-500 mt-2">Gemini is thinking...</p>
+        </div>
+
+        <div id="resultContainer" class="hidden mt-8 p-6 bg-blue-50 rounded-lg border border-blue-100">
+            <h3 class="font-bold text-blue-800 mb-2">Analysis Result:</h3>
+            <p id="resultText" class="text-gray-700 leading-relaxed"></p>
+        </div>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            const preview = document.getElementById('preview');
+            const label = document.getElementById('file-label');
+            const file = event.target.files[0];
+
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.classList.remove('hidden');
+                label.innerText = file.name;
+            }
+        }
+
+        async function uploadImage() {
+            const fileInput = document.getElementById('imageInput');
+            const btn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultText = document.getElementById('resultText');
+
+            if (!fileInput.files[0]) return alert("Please select an image first!");
+
+            // UI State: Loading
+            btn.disabled = true;
+            loading.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                // Adjust this URL if your FastAPI port is different
+                const response = await fetch('http://127.0.0.1:8000/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                resultText.innerText = data.description;
+                resultContainer.classList.remove('hidden');
+            } catch (error) {
+                alert("Error connecting to the backend!");
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                loading.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
