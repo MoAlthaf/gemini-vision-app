@@ -1,0 +1,7 @@
+
+# Environments
+.backend/
+
+# Environment variables (Secrets)
+.env
+
