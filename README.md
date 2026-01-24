@@ -57,10 +57,3 @@ Open your browser and navigate to http://127.0.0.1:8000.
 - `app/static/`: Frontend assets (HTML/CSS/JS).
 
 ---
-
-## 2. The Final Commit
-This is the "bow on top" of your project. This commit signals that the project is documented and ready for others to see.
-
-```bash
-git add README.md
-git commit -m "docs: add professional README with setup instructions"
