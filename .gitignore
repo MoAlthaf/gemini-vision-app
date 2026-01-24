@@ -5,3 +5,6 @@
 # Environment variables (Secrets)
 .env
 
+# Python cache
+__pycache__/
+services/__pycache__/
